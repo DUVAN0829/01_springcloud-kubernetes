@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class UserController {
@@ -45,6 +42,13 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result) {
 
+        if (services.findByEmail(user.getEmail()).isPresent()) {
+
+            return ResponseEntity.badRequest()
+                    .body(Collections.singletonMap("message: ", "A user with email Already exists."));
+
+        }
+
         if (result.hasErrors()) {
 
             return validationBody(result);
@@ -68,6 +72,14 @@ public class UserController {
         if (optionalUser.isPresent()) {
 
             User userDb = optionalUser.get();
+
+            if (!user.getEmail().equals(userDb.getEmail()) && services.findByEmail(user.getEmail()).isPresent()) { //* Valida que no se intente poner el mismo correo electronico o uno que ya exista.
+
+                return ResponseEntity.badRequest()
+                        .body(Collections.singletonMap("message: ", "A user with email Already exists."));
+
+            }
+
             userDb.setName(user.getName());
             userDb.setEmail(user.getEmail());
             userDb.setPassword(user.getPassword());
