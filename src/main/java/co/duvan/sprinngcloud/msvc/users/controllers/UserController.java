@@ -2,12 +2,16 @@ package co.duvan.sprinngcloud.msvc.users.controllers;
 
 import co.duvan.sprinngcloud.msvc.users.models.entity.User;
 import co.duvan.sprinngcloud.msvc.users.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -39,13 +43,25 @@ public class UserController {
 
     //*Create
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody User user) {
+    public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result) {
+
+        if (result.hasErrors()) {
+
+            return validationBody(result);
+
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(services.save(user));
+
     }
 
     //*Update
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@RequestBody User user, @PathVariable Long id) {
+    public ResponseEntity<?> update(@Valid @RequestBody User user, BindingResult result, @PathVariable Long id) {
+
+        if (result.hasErrors()) {
+            validationBody(result);
+        }
 
         Optional<User> optionalUser = services.findById(id);
 
@@ -78,6 +94,19 @@ public class UserController {
         }
 
         return ResponseEntity.notFound().build();
+
+    }
+
+    //* Method: Validation Json Body
+    public ResponseEntity<Map<String, String>> validationBody(BindingResult result) {
+
+        Map<String, String> errores = new HashMap<>();
+
+        result.getFieldErrors().forEach(error -> {
+            errores.put(error.getField(), " El campo " + error.getField() + " " + error.getDefaultMessage());
+        });
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errores);
 
     }
 
