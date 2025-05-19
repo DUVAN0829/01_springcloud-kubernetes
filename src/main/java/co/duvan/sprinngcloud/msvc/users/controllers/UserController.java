@@ -42,16 +42,16 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result) {
 
-        if (services.findByEmail(user.getEmail()).isPresent()) {
-
-            return ResponseEntity.badRequest()
-                    .body(Collections.singletonMap("message: ", "A user with email Already exists."));
-
-        }
-
         if (result.hasErrors()) {
 
             return validationBody(result);
+
+        }
+
+        if (!user.getEmail().isEmpty() && services.findByEmail(user.getEmail()).isPresent()) {
+
+            return ResponseEntity.badRequest()
+                    .body(Collections.singletonMap("message: ", "A user with that email Already exists."));
 
         }
 
@@ -73,10 +73,12 @@ public class UserController {
 
             User userDb = optionalUser.get();
 
-            if (!user.getEmail().equals(userDb.getEmail()) && services.findByEmail(user.getEmail()).isPresent()) { //* Valida que no se intente poner el mismo correo electronico o uno que ya exista.
+            if (!user.getEmail().isEmpty() &&
+                    !user.getEmail().equals(userDb.getEmail()) &&
+                    services.findByEmail(user.getEmail()).isPresent()) { //* Valida que no se intente poner el mismo correo electronico o uno que ya exista.
 
                 return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("message: ", "A user with email Already exists."));
+                        .body(Collections.singletonMap("message: ", "A user with that email Already exists."));
 
             }
 
