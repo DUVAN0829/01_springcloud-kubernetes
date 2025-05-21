@@ -2,6 +2,7 @@ package co.duvan.sprinngcloud.msvc.users.services;
 
 import co.duvan.sprinngcloud.msvc.users.models.entity.User;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +17,7 @@ public interface UserService {
     void delete(Long id);
 
     Optional<User> findByEmail(String email);
+
+    List<User> listById(Iterable<Long> ids);
 
 }

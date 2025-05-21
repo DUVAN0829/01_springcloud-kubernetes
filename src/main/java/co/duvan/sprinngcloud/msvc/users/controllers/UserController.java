@@ -124,6 +124,12 @@ public class UserController {
 
     }
 
+    //* Get all users by id
+    @GetMapping("/users-by-curso")
+    public ResponseEntity<?> getStudentsByCourse(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(services.listById(ids));
+    }
+
 }
 
 
