@@ -1,5 +1,6 @@
 package co.duvan.sprinngcloud.msvc.users.services;
 
+import co.duvan.sprinngcloud.msvc.users.clients.CursoClienteFeign;
 import co.duvan.sprinngcloud.msvc.users.models.entity.User;
 import co.duvan.sprinngcloud.msvc.users.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,14 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    //vars
+    //* vars
     @Autowired
     private UserRepository repository;
 
-    //Methods
+    @Autowired
+    private CursoClienteFeign clientRest;
+
+    //* Methods
     @Override
     @Transactional(readOnly = true)
     public List<User> listAll() {
@@ -40,6 +44,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
+        clientRest.deleteCursoUser(id);
     }
 
     @Override
